@@ -1,0 +1,7 @@
+*.pkl
+!/data/highD/
+*.png
+*.csv
+!/data/cache/
+!/data/highD/
+*.pyc
