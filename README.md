@@ -1,7 +1,6 @@
 # Bayesian Calibration of IDM
 
-### This repo provides the implementation of MA-IDM and Bayesian IDM in paper ''Bayesian Calibration of Intelligent Driver
-Model.''
+### This repo provides the implementation of MA-IDM and Bayesian IDM in paper ''Bayesian Calibration of Intelligent Driver Model.''
 
 <center>
   <img src="./Figs/idm_pgm.png" width="85%" />
