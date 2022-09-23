@@ -1,7 +1,8 @@
 *.pkl
-!/data/highD/
+!/data/highD/*.png
 *.png
 *.csv
 !/data/cache/
 !/data/highD/
 *.pyc
+!/.idea/

@@ -1,0 +1,15 @@
+Index: README.md
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+> re# IDM_Bayesian_Calibration
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/README.md b/README.md
+--- a/README.md	(revision 96948f114ad490739ccbffee00d5e85d8fc989a0)
++++ b/README.md	(date 1663728791013)
+@@ -1,1 +1,2 @@
+- re# IDM_Bayesian_Calibration
+\ No newline at end of file
++# IDM_Bayesian_Calibration
++

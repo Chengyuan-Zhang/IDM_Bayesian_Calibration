@@ -4,7 +4,7 @@
 Model.''
 
 <center>
-  <img src="./Figs/pgm.png" width="85%" />
+  <img src="./Figs/idm_pgm.png" width="85%" />
 </center>
 
 ## How to run

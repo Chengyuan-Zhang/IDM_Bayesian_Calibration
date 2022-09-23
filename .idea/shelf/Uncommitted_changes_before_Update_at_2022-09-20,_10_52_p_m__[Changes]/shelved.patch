@@ -1,0 +1,42 @@
+Index: PGM/Results_analysis.ipynb
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/PGM/Results_analysis.ipynb b/PGM/Results_analysis.ipynb
+--- a/PGM/Results_analysis.ipynb	(revision 96948f114ad490739ccbffee00d5e85d8fc989a0)
++++ b/PGM/Results_analysis.ipynb	(date 1663728743112)
+@@ -84,9 +84,9 @@
+     "plt.plot(T,x,'-g', label='truck follower')\n",
+     "\n",
+     "    \n",
+-    "plt.xlabel('time (s)',fontsize=16)\n",
+-    "plt.ylabel('space (m)',fontsize=16)\n",
+-    "plt.legend(loc='best',fontsize=16)\n",
++    "plt.xlabel('time (s)',fontsize=20)\n",
++    "plt.ylabel('space (m)',fontsize=20)\n",
++    "plt.legend(loc='best',fontsize=20)\n",
+     "plt.tight_layout()\n",
+     "plt.show()\n",
+     "# figure.savefig('../Figs/show_data.pdf', dpi=300)"
+Index: PGM/.ipynb_checkpoints/Results_analysis-checkpoint.ipynb
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/PGM/.ipynb_checkpoints/Results_analysis-checkpoint.ipynb b/PGM/.ipynb_checkpoints/Results_analysis-checkpoint.ipynb
+--- a/PGM/.ipynb_checkpoints/Results_analysis-checkpoint.ipynb	(revision 96948f114ad490739ccbffee00d5e85d8fc989a0)
++++ b/PGM/.ipynb_checkpoints/Results_analysis-checkpoint.ipynb	(date 1663728743224)
+@@ -84,9 +84,9 @@
+     "plt.plot(T,x,'-g', label='truck follower')\n",
+     "\n",
+     "    \n",
+-    "plt.xlabel('time (s)',fontsize=16)\n",
+-    "plt.ylabel('space (m)',fontsize=16)\n",
+-    "plt.legend(loc='best',fontsize=16)\n",
++    "plt.xlabel('time (s)',fontsize=20)\n",
++    "plt.ylabel('space (m)',fontsize=20)\n",
++    "plt.legend(loc='best',fontsize=20)\n",
+     "plt.tight_layout()\n",
+     "plt.show()\n",
+     "# figure.savefig('../Figs/show_data.pdf', dpi=300)"
