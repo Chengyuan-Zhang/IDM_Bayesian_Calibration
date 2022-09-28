@@ -7,12 +7,13 @@
 </center>
 
 ## How to run
-We calibrate our model on [highD dataset](https://www.highd-dataset.com/). Please download and store the data in the ```./data/highD``` folder, e.g., it should contains ```./data/highD/**_tracks.csv```, ```data/highD/**_tracksMeta.csv```, and ```data/highD/**_recordingMeta.csv```.
+We calibrate our model on [highD dataset](https://www.highd-dataset.com/). Please download and store the data in the ```./data/highD``` folder, e.g., it should contains ```./data/highD/**_tracks.csv```, ```./data/highD/**_tracksMeta.csv```, and ```.data/highD/**_recordingMeta.csv```.
 
-The probabilistic graphical models are implemented in: ```./PGM/Bayesian_IDM_(hierarchy)_(driver_type).ipynb``` and ```./PGM/MA_IDM_(hierarchy)_(driver_type).ipynb```;
+We develop the probabilistic graphical models (PGMs) with [PyMC](https://github.com/pymc-devs/pymc), please install PyMC4 by following their instructions. The PGMs in this work are implemented in: ```./PGM/Bayesian_IDM_(hierarchy)_(driver_type).ipynb``` and ```./PGM/MA_IDM_(hierarchy)_(driver_type).ipynb```;
 
-To visualize the result: ```./PGM/Results_analysis.ipynb.ipynb```;
+To visualize the result and conduct the single-vehicle stochastic simulations: ```./PGM/Results_analysis.ipynb.ipynb```;
 
+To conduct the multi-vehicle ring-road simulations, run  ```./Simulator/simulation_ring.py```
 
 ## Contact
 
@@ -22,4 +23,4 @@ and [Lijun Sun](https://lijunsun.github.io/) (<lijun.sun@mcgill.ca>).**
 
 ## Future updates (coming soon)
 
-We will process highD and provide some toy data for simply running and trying the code.
+We will process highD and provide some toy data for simple running and trying of the code.

@@ -328,6 +328,7 @@ def load_tracks(GP_flag):
 
 
 if __name__ == '__main__':
+    # remember to change the Config.frame_rate to 2 for the ring-road simulation
     GP_flag = False
     savefig = False
     tracks = load_tracks(GP_flag)
