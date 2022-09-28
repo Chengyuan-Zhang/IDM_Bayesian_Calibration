@@ -6,7 +6,7 @@ import os
 class Config:
     # HighD preprocessing
 
-    frame_rate = 25 #2
+    frame_rate = 25  # Change to 2 for the ring-road simulation
     dt = 1 / frame_rate
     min_traj_lenth = 50 / dt
 
@@ -20,7 +20,7 @@ class Config:
     sim_eps_sigma_GP = .1
 
     sim_ring_tracks = 37  # 20
-    sim_ring_time = 6000 # 80000
+    sim_ring_time = 6000  # 80000
     sim_ring_radius = 128  # 33.5
     sim_ring_init_speed = 11.6  # 8
 
