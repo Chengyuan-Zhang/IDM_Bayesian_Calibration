@@ -1,6 +1,9 @@
-# Bayesian Calibration of IDM
+## *(Update: the latest version will be uploaded in June 2023)*
+
+# Bayesian Calibration of IDM 
 
 ### This repo provides the implementation of MA-IDM and Bayesian IDM in paper ''Bayesian Calibration of Intelligent Driver Model.''
+
 
 <center>
   <img src="./Figs/idm_pgm.png" width="85%" />
@@ -20,6 +23,10 @@ in: ```./PGM/Bayesian_IDM_(hierarchy)_(driver_type).ipynb``` and ```./PGM/MA_IDM
 To visualize the result and conduct the single-vehicle stochastic simulations: ```./PGM/Results_analysis.ipynb.ipynb```;
 
 To conduct the multi-vehicle ring-road simulations, run  ```./Simulator/simulation_ring.py```
+
+## Read More
+- Access our project via: [[arxiv](https://arxiv.org/abs/2210.03571)].
+- Presentation: [[recording](https://youtu.be/GIqcL6I7MsU)].
 
 ## Contact
 
