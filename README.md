@@ -27,6 +27,7 @@ To conduct the multi-vehicle ring-road simulations, run  ```./Simulator/simulati
 ## Read More
 - Access our project via: [[arxiv](https://arxiv.org/abs/2210.03571)].
 - Presentation: [[recording](https://youtu.be/GIqcL6I7MsU)].
+- What is LKJ Cholesky Covariance Priors: [https://www.pymc.io/projects/examples/en/latest/case_studies/LKJ.html](https://www.pymc.io/projects/examples/en/latest/case_studies/LKJ.html).
 
 ## Contact
 
