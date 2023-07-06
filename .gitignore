@@ -1,8 +1,6 @@
-*.pkl
-!/data/highD/*.png
-*.png
-*.csv
-!/data/cache/
-!/data/highD/
 *.pyc
-!/.idea/
+/.idea/
+/PGM_highD/.ipynb_checkpoints/
+/PGM_highD_joint/.ipynb_checkpoints/
+/PGM_OpenACC/.ipynb_checkpoints/
+*.pkl
