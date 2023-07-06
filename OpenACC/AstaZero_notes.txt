@@ -1,0 +1,49 @@
+Dates: 04.07.2019, 05.07.2019
+
+General description: 
+This campaign was conducted in the second quarter of 2019 and it involves two days of car-following testing on the Rural road of the AstaZero test track in Sweden. The Rural road is approximately 5.7 km long. The campaign involves five high-end vehicles, from four different makes, all different models. 
+The system used for trajectory data acquisition is the RT-Range S multiple target ADAS measurements solution by Oxford Technical Solutions Company, with a differential GPS accuracy. This acquiring system provided a frequency of more 100 Hz, so downsampling was applied to achieve a 10 Hz.
+The experiments are organized in laps. In all the tests, the leading vehicle is the same and it is driven with the ACC enabled. In general, two different car-following patterns are applied for the following vehicles, a) car-platoon with constant speed and b) car-platoon with the performance of perturbations (deceleration to a new desired speed) from an equilibrium point. Followers were driving with ACC on apart from two laps where manual driving situations were tested.
+
+Total number of vehicles: 5 
+
+Equipment: OxTS.
+
+Data processing: Downsampling was applied to achieve a 10 Hz
+
+Columns description:
+Time:	Common time frame for all vehicles (s)
+Speed:	Raw Speed (Doppler) (m/s)
+Lat:	Latitude (rad)
+Lon:	Longitude (rad)
+Alt:	Altitude (m)
+E:	East (x) coordinate in the local ENU plane (common center for all vehicles) (m)
+N:	North (y) coordinate in the local ENU plane (common center for all vehicles) (m)
+U:	Up (z) coordinate in the local ENU plane (common center for all vehicles) (m)
+IVS:	Inter Vehicle Spacing computed from Differential GNSS data after bumper to bumper correction (m)
+Driver:	The driver of the vehicle: “Human” for manual driving, “ACC” for ACC driving
+
+Csv file naming:
+Filenames have the format of mentioning the following information separated by underscore:
+1. Proving ground name
+2. date
+3. platoon number
+Example of a filename: ASta_040719_platoon3
+
+Csv Metadata information:
+Metadata that are trip-experiment specific are saved as header (comma seperated) (5 rows) in the csv file in this example form:
+Date,DD,MM,YYYY		
+Vehicle_order,veh1,veh2,etc	
+Number_of_vehicles,5					
+ACC, 1 
+Distance_setting,min					
+
+Comments:
+-ACC option: 0 when the whole experiment is conducted in manually driving conditions, 1 when the whole experiment is conducted with ACC.
+
+-Distance_setting option: min, max or none in the case of manual driving.
+
+-IVS1 denotes IVS between vehicle 1 and vehicle 2, etc.
+ 			
+				
+

@@ -1,9 +1,8 @@
-## *(Update: the latest version will be uploaded in June 2023)*
+## *(Update: the stochastic simulations of the pooled and unpooled models will be updated in July 2023)*
 
-# Bayesian Calibration of IDM 
+# Bayesian Calibration of IDM
 
-### This repo provides the implementation of MA-IDM and Bayesian IDM in paper ''Bayesian Calibration of Intelligent Driver Model.''
-
+### This repo provides the implementation of MA-IDM and Bayesian IDM in ''Bayesian Calibration of Intelligent Driver Model,'' as well as the dynamic IDM (AR+IDM) in our latest paper "Calibrating Car-following Models via Bayesian Dynamic Regression." (This paper will be online since July 1st.) Besides, the repo provides the implementation of the multi-vehicle ring-road simulations.
 
 <center>
   <img src="./Figs/idm_pgm.png" width="85%" />
@@ -25,9 +24,11 @@ To visualize the result and conduct the single-vehicle stochastic simulations: `
 To conduct the multi-vehicle ring-road simulations, run  ```./Simulator/simulation_ring.py```
 
 ## Read More
+
 - Access our project via: [[arxiv](https://arxiv.org/abs/2210.03571)].
 - Presentation: [[recording](https://youtu.be/GIqcL6I7MsU)].
-- What is LKJ Cholesky Covariance Priors: [https://www.pymc.io/projects/examples/en/latest/case_studies/LKJ.html](https://www.pymc.io/projects/examples/en/latest/case_studies/LKJ.html).
+- What is LKJ Cholesky Covariance
+  Priors: [https://www.pymc.io/projects/examples/en/latest/case_studies/LKJ.html](https://www.pymc.io/projects/examples/en/latest/case_studies/LKJ.html).
 
 ## Contact
 

@@ -1,0 +1,6 @@
+Vehicles,Max power (kW),Drive-Fuel,Engine displacement (cc),Battery capacity (kWh),Propulsion type ,Top speed (km/h),Model year
+Audi (A8),210,diesel,2967,-,ICE,250,2018
+Tesla (Model 3),150,electricity,-,79,BEV,210,2019
+BMW (X5),195,diesel,2993,-,ICE,230,2018
+Mercedes (A Class),165,gasoline,1991,-,ICE,250,2019
+Audi (A6),150,diesel,1968,-,ICE,246,2018

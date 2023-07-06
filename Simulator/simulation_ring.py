@@ -38,38 +38,48 @@ def load_trace(cache):
     return tr
 
 
-def RBF_kernel(XA, XB, l=33, A=0.2):
+def RBF_kernel(XA, XB, l=7, A=0.3):
     X_dist = A ** 2 * rbf_kernel(XA[:, [0]], XB[:, [0]], gamma=0.5 / l ** 2)
     return X_dist
 
 
 # Gaussian process posterior
-def GP(X1, y1, X2, kernel_func):
+def GP(X1, y1, X2, kernel_func, tr):
     """
     Calculate the posterior mean and covariance matrix for y2
     based on the corresponding input X2, the observations (y1, X1),
     and the prior kernel function.
     """
     # Kernel of the observations
-    Σ11 = kernel_func(X1, X1)
+    l = tr.posterior.l.mean(axis=0).mean(axis=0).to_numpy()
+    A = np.sqrt(tr.posterior.s2_f.mean(axis=0).mean(axis=0)).to_numpy()
+    Σ11 = kernel_func(X1, X1, l=l, A=A)
     # Kernel of observations vs to-predict
-    Σ12 = kernel_func(X1, X2)
+    Σ12 = kernel_func(X1, X2, l=l, A=A)
     # Solve
     solved = scipy.linalg.solve(Σ11, Σ12).T
     # Compute posterior mean
     μ2 = solved @ y1
     # Compute the posterior covariance
-    Σ22 = kernel_func(X2, X2, l=int(33 * 0.04 / Config.dt), A=0.2)
+    Σ22 = kernel_func(X2, X2, l=l, A=A)
     Σ2 = Σ22 - (solved @ Σ12)
     return μ2, Σ2  # mean, covariance
 
 
-def ring_scenarios(GP_flag=True):
-    cache = "../PGM/cache/GP_IDM_hierarchical-exp.pkl"
+def ring_scenarios(sim_method='IDM'):
+    if sim_method == 'AR':
+        cache = '../PGM_highD_joint/cache/AR4_IDM_hierarchical.pkl'
+    elif sim_method == 'GP':
+        cache = "../PGM_highD/cache/MA_IDM_hierarchical.pkl"
+    else:
+        cache = '../PGM_highD_joint/cache/Bayesian_IDM_hierarchical.pkl'
+
     tr = load_trace(cache)
-    id_idx = np.random.choice(range(20000), Config.sim_ring_tracks, replace=False)
-    driver_idx = np.random.choice(range(8), Config.sim_ring_tracks, replace=True)
+    id_idx = np.random.choice(range(2000), Config.sim_ring_tracks, replace=False)
+    driver_idx = np.random.choice(range(20), Config.sim_ring_tracks, replace=True)
+    # params = tr.posterior.mu_d[0, :, driver_idx, :].mean(axis=0)
     params = tr.posterior.mu_d[0, id_idx, driver_idx, :]
+    params *= [33, 2, 1.6, 1.5, 1.67]
 
     tracks = [None] * Config.sim_ring_tracks
     init_pos_theta = np.linspace(0, 2 * np.pi, Config.sim_ring_tracks + 1)
@@ -81,17 +91,18 @@ def ring_scenarios(GP_flag=True):
                       'a': np.zeros(N),
                       'v': np.zeros(N)}
 
-    if GP_flag:
-        # we select a window size of 3l = 99:
-        sample_dim = int(3 * 33 * 0.04 / Config.dt)
-        #         a_GP_sim = np.zeros(N)
-
-        t = np.array(range(-sample_dim, N)).reshape(-1, 1)
+    if sim_method == 'GP':
+        # we select a window size of 2\ell:
+        sample_dim = int(2 * tr.posterior.l.mean(axis=0).mean(axis=0))
         X1 = np.expand_dims(np.linspace(-sample_dim, 0, sample_dim), 1)
         y1 = np.zeros((sample_dim))
         X2 = np.expand_dims(np.linspace(0, N, N), 1)
-        μ2, Σ2 = GP(X1, y1, X2, RBF_kernel)
+        μ2, Σ2 = GP(X1, y1, X2, RBF_kernel, tr)
         a_GP_sim = np.random.multivariate_normal(mean=μ2, cov=Σ2, size=Config.sim_ring_tracks)
+    elif sim_method == 'AR':
+        a_AR_sim = np.random.normal(0, tr.posterior.s_a.mean(axis=0).mean(axis=0),
+                                    size=(Config.sim_ring_tracks, 4))
+        rho = tr.posterior.rho[:, :, :].mean(axis=0).mean(axis=0).to_numpy()
 
     for t in range(N - 1):
         for id in range(Config.sim_ring_tracks):
@@ -110,13 +121,24 @@ def ring_scenarios(GP_flag=True):
             v = tracks[id]['v'][t]
             if s < 0:
                 s += Config.sim_ring_radius * 2 * np.pi
-            if GP_flag:
+            if sim_method == 'GP':
                 a_eps = a_GP_sim[id, t - 1] + np.random.normal(0, 0.1)
                 a = np.max((a_IDM(params[id, id, 0], params[id, id, 1], params[id, id, 2], params[id, id, 3],
-                                  params[id, id, 4], 4, s, v, dv) + a_eps, -6))
+                                  params[id, id, 4], 4, s, v, dv) + a_eps, -10))
+            elif sim_method == 'AR':
+                a_eps = (rho * a_AR_sim[id, :]).sum() + np.random.normal(0, tr.posterior.s_a.mean(axis=0).mean(
+                    axis=0))
+                a = np.max((a_IDM(params[id, id, 0], params[id, id, 1], params[id, id, 2], params[id, id, 3],
+                                  params[id, id, 4], 4, s, v, dv) + a_eps, -10))
+                a_AR_sim[id, :-1] = a_AR_sim[id, 1:]
+                a_AR_sim[id, -1] = a_eps
+            elif sim_method == 'Bayesian':
+                a_eps = np.random.normal(0, tr.posterior.s_a.mean(axis=0).mean(axis=0))
+                a = np.max((a_IDM(params[id, id, 0], params[id, id, 1], params[id, id, 2], params[id, id, 3],
+                                  params[id, id, 4], 4, s, v, dv) + a_eps, -10))
             else:
-                a_eps = np.random.normal(0, 0.3)
-                a = np.max((a_IDM(33.3, 2, 1.6, .73, 1.67, 4, s, v, dv) + a_eps, -6))
+                a_eps = np.random.normal(0, tr.posterior.s_a.mean(axis=0).mean(axis=0))
+                a = np.max((a_IDM(33.3, 2, 1.6, .73, 1.67, 4, s, v, dv) + a_eps, -10))
                 # 33.3, 2, 1.6, .73, 1.67, 4
                 # VMAX, DSAFE, TSAFE, AMAX, AMIN, DELTA
             v_new = np.max((v + a * Config.dt, 0))
@@ -125,20 +147,20 @@ def ring_scenarios(GP_flag=True):
             tracks[id]['a'][t] = a
             tracks[id]['pos_s'][t + 1] = (tracks[id]['pos_s'][t] + dx) % (
                     2 * np.pi * R)
-            tracks[id]['pos_theta'][t + 1] = tracks[id]['pos_s'][t] / R
+            tracks[id]['pos_theta'][t + 1] = tracks[id]['pos_s'][t + 1] / R
         if (t + 1) % 100 == 0:
             print("Simulation:", t + 1, "/", N)
     return tracks
 
 
-def plot_GP_IDM_simulation(tracks, GP_flag):
-    plt.rcParams['text.usetex'] = True
-    plt.rcParams["font.family"] = "Times New Roman"
-    matplotlib.rcParams['font.size'] = 26
-    matplotlib.rcParams['font.family'] = 'Times New Roman'
+def plot_IDM_simulation(tracks, sim_method):
+    plt.rcParams['text.usetex'] = False
+    plt.rcParams["font.family"] = "Arial"
+    matplotlib.rcParams['font.size'] = 24
+    matplotlib.rcParams['font.family'] = 'Arial'
+    plt.rcParams['mathtext.fontset'] = 'cm'
 
-    fig, ax = plt.subplots(figsize=(12, 4))
-    # fig = plt.figure(figsize=(16, 10))
+    fig, ax = plt.subplots(figsize=(12, 3.7))
 
     tt = np.arange(Config.sim_ring_time)
 
@@ -149,7 +171,6 @@ def plot_GP_IDM_simulation(tracks, GP_flag):
         v = tracks[id]['v']
 
         ###################################
-        # ax = plt.subplot(3, 1, 1)
         points = np.array([tt * Config.dt, pos_s]).T.reshape(-1, 1, 2)
         segments = np.concatenate([points[:-1], points[1:]], axis=1)
         idx_delete = np.where(segments[:, 0, 1] - segments[:, 1, 1] > 0)
@@ -158,20 +179,10 @@ def plot_GP_IDM_simulation(tracks, GP_flag):
         lc = LineCollection(segments, cmap='jet_r', norm=norm)
         # Set the values used for colormapping
         lc.set_array(v)
-        lc.set_linewidth(1)
+        lc.set_linewidth(1.37)
         line = ax.add_collection(lc)
         plt.xlim((0, tt[-1] * Config.dt))
         plt.ylim((0, Config.sim_ring_radius * 2 * np.pi))
-
-        # ###################################
-        # ax2 = plt.subplot(3, 1, 2)
-        # ax2.plot(tt[:-1] * Config.dt, pos_theta_mask)
-        # plt.xlim((0, tt[-1] * Config.dt))
-        # plt.ylim((0, 2 * np.pi))
-        #
-        # ax3 = plt.subplot(3, 1, 3)
-        # ax3.plot(tt * Config.dt, a)
-        # plt.xlim((0, tt[-1] * Config.dt))
 
     cax = ax.inset_axes([1.06, 0., 0.015, 1.0], transform=ax.transAxes)
     fig.colorbar(line, ax=ax, cax=cax)
@@ -180,9 +191,13 @@ def plot_GP_IDM_simulation(tracks, GP_flag):
     plt.ylabel('space (m)')
 
     ax.set_rasterized(True)
-    plt.tight_layout()
-    if GP_flag:
+    plt.tight_layout(rect=(-0.025, -0.08, 1.025, 1.07))
+    if sim_method == 'AR':
+        fig.savefig('../Figs/Sim_AR_IDM.pdf', dpi=300)
+    elif sim_method == 'GP':
         fig.savefig('../Figs/Sim_GP_IDM.pdf', dpi=300)
+    elif sim_method == 'Bayesian':
+        fig.savefig('../Figs/Sim_B_IDM.pdf', dpi=300)
     else:
         fig.savefig('../Figs/Sim_IDM.pdf', dpi=300)
     plt.show()
@@ -202,8 +217,6 @@ def fundamental_area(tracks, L, T):
             t_all = 0
             for id in range(Config.sim_ring_tracks):
                 for t in range(T * tt, T * (tt + 1)):
-                    if t == 8000:
-                        print('a')
                     x = tracks[id]['pos_s'][t]
                     v = tracks[id]['v'][t]
                     if x < upper and x > lower:
@@ -220,18 +233,23 @@ def fundamental_area(tracks, L, T):
 
 
 def plot_speed_density(savefig):
-    plt.rcParams['text.usetex'] = True
-    plt.rcParams["font.family"] = "Times New Roman"
+    # plt.rcParams['text.usetex'] = True
+    # plt.rcParams["font.family"] = "Times New Roman"
+    # matplotlib.rcParams['font.size'] = 22
+    # matplotlib.rcParams['font.family'] = 'Times New Roman'
+    plt.rcParams['text.usetex'] = False
+    plt.rcParams["font.family"] = "Arial"
     matplotlib.rcParams['font.size'] = 22
-    matplotlib.rcParams['font.family'] = 'Times New Roman'
+    matplotlib.rcParams['font.family'] = 'Arial'
+    plt.rcParams['mathtext.fontset'] = 'cm'
 
     alpha = 0.4
     L = 50
     T = int(60 / Config.dt)
 
-    tracks = load_tracks(GP_flag=False)
+    tracks = load_tracks(sim_method='IDM')
     speed, density, flow = fundamental_area(tracks, L, T)
-    tracks_GP = load_tracks(GP_flag=True)
+    tracks_GP = load_tracks(sim_method='AR')
     speed_GP, density_GP, flow_GP = fundamental_area(tracks_GP, L, T)
 
     speed = speed[1:]
@@ -303,11 +321,23 @@ def plot_speed_density(savefig):
     plt.show()
 
 
-def load_tracks(GP_flag):
-    if GP_flag:
-        cache = "../Simulator/cache/GP_IDM_hierarchical-sim_37_8000_128_11_noisy.pkl"
+def load_tracks(sim_method):
+    if sim_method == 'GP':
+        cache = "../Simulator/cache/GP_IDM-sim_{:d}_{:d}_{:d}_11_noisy.pkl".format(int(Config.sim_ring_tracks),
+                                                                                   int(Config.sim_ring_time),
+                                                                                   Config.sim_ring_radius)
+    elif sim_method == 'AR':
+        cache = "../Simulator/cache/AR_IDM-sim_{:d}_{:d}_{:d}_11_noisy.pkl".format(int(Config.sim_ring_tracks),
+                                                                                   int(Config.sim_ring_time),
+                                                                                   Config.sim_ring_radius)
+    elif sim_method == 'Bayesian':
+        cache = "../Simulator/cache/B_IDM-sim_{:d}_{:d}_{:d}_11_noisy.pkl".format(int(Config.sim_ring_tracks),
+                                                                                  int(Config.sim_ring_time),
+                                                                                  Config.sim_ring_radius)
     else:
-        cache = "../Simulator/cache/IDM-sim_37_8000_128_11_noisy2.pkl"
+        cache = "../Simulator/cache/IDM-sim_{:d}_{:d}_{:d}_11_noisy.pkl".format(int(Config.sim_ring_tracks),
+                                                                                int(Config.sim_ring_time),
+                                                                                Config.sim_ring_radius)
 
     if path.exists(cache):
         try:
@@ -319,7 +349,7 @@ def load_tracks(GP_flag):
             os.remove(cache)
             print('Removed broken cache:', cache)
     else:
-        tracks = ring_scenarios(GP_flag)
+        tracks = ring_scenarios(sim_method)
         output_file = open(cache, 'wb')
         pickle.dump(tracks, output_file)
         output_file.close()
@@ -329,8 +359,8 @@ def load_tracks(GP_flag):
 
 if __name__ == '__main__':
     # remember to change the Config.frame_rate to 2 for the ring-road simulation
-    GP_flag = False
-    savefig = False
-    tracks = load_tracks(GP_flag)
-    plot_GP_IDM_simulation(tracks, GP_flag)
-    plot_speed_density(savefig)
+    sim_method = 'AR'  # 'IDM', 'GP', 'AR', 'Bayesian'
+    savefig = True
+    tracks = load_tracks(sim_method)
+    plot_IDM_simulation(tracks, sim_method)
+    # plot_speed_density(savefig)
