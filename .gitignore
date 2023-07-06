@@ -1,6 +1,0 @@
-*.pyc
-/.idea/
-/PGM_highD/.ipynb_checkpoints/
-/PGM_highD_joint/.ipynb_checkpoints/
-/PGM_OpenACC/.ipynb_checkpoints/
-*.pkl
