@@ -2,7 +2,7 @@
 
 # Bayesian Calibration of IDM
 
-### This repo provides the implementation of MA-IDM and Bayesian IDM in ''Bayesian Calibration of Intelligent Driver Model,'' as well as the dynamic IDM (AR+IDM) in our latest paper "Calibrating Car-following Models via Bayesian Dynamic Regression." (This paper will be online since July 8th.) Besides, the repo provides the implementation of the multi-vehicle ring-road simulations.
+This repo provides the implementation of MA-IDM and Bayesian IDM in ''**Bayesian Calibration of Intelligent Driver Model**,'' as well as the dynamic IDM (AR+IDM) in our latest paper "**Calibrating Car-following Models via Bayesian Dynamic Regression.**" (This paper will be online from July 8th.) Besides, the repo provides the implementation of the multi-vehicle ring-road simulations.
 
 <center>
   <img src="./Figs/idm_pgm.png" width="85%" />
@@ -12,10 +12,10 @@
 
 We calibrate our model on [highD dataset](https://www.highd-dataset.com/). The preprocessed data are stored
 in ```data/cache/*.pkl```. To implement your preprocessing procedures, please download and store the original data in
-the ```data/highD``` folder, e.g., it should contains ```data/highD/**_tracks.csv```
+the ```data/highD``` folder, e.g., it should contain ```data/highD/**_tracks.csv```
 , ```data/highD/**_tracksMeta.csv```, and ```data/highD/**_recordingMeta.csv```.
 
-We develop the probabilistic graphical models (PGMs) with [PyMC](https://github.com/pymc-devs/pymc), please install
+We develop the probabilistic graphical models (PGMs) with [PyMC](https://github.com/pymc-devs/pymc). Please install
 **PyMC4** by following their instructions. The PGMs in this work are implemented
 in: ```PGM_highD/Bayesian_IDM_(hierarchy)_(driver_type).ipynb```, ```PGM_highD/MA_IDM_(hierarchy)_(driver_type).ipynb```,
 and ```PGM_highD/AR_IDM_(hierarchy)_(driver_type).ipynb```;
@@ -35,6 +35,6 @@ To conduct the multi-vehicle ring-road simulations, run  ```Simulator/simulation
 
 ## Contact
 
-**If you have any questions please feel free to contact
+**If you have any questions, please feel free to contact
 us:  [Chengyuan Zhang](https://chengyuan-zhang.github.io/) (<enzozcy@gmail.com>)
 and [Lijun Sun](https://lijunsun.github.io/) (<lijun.sun@mcgill.ca>).**
