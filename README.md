@@ -2,7 +2,7 @@
 
 # Bayesian Calibration of IDM
 
-This repo provides the implementation of MA-IDM and Bayesian IDM in ''**Bayesian Calibration of Intelligent Driver Model**,'' as well as the dynamic IDM (AR+IDM) in our latest paper "**Calibrating Car-following Models via Bayesian Dynamic Regression.**" (This paper will be online from July 8th.) Besides, the repo provides the implementation of the multi-vehicle ring-road simulations.
+This repo provides the implementation of MA-IDM and Bayesian IDM in ''**Bayesian Calibration of Intelligent Driver Model**,'' as well as the dynamic IDM (AR+IDM) in our latest paper "**Calibrating Car-following Models via Bayesian Dynamic Regression.**" Besides, the repo provides the implementation of the multi-vehicle ring-road simulations.
 
 <center>
   <img src="./Figs/idm_pgm.png" width="85%" />
@@ -28,7 +28,7 @@ To conduct the multi-vehicle ring-road simulations, run  ```Simulator/simulation
 
 ## Read More
 
-- Access our project via: [[arxiv](https://arxiv.org/abs/2210.03571)].
+- Access our project via: GP+IDM [[arXiv](https://arxiv.org/abs/2210.03571)] and AR+IDM [[arXiv](https://arxiv.org/pdf/2307.03340.pdf)].
 - Presentation: [[recording](https://youtu.be/GIqcL6I7MsU)].
 - What is LKJ Cholesky Covariance
   Priors: [https://www.pymc.io/projects/examples/en/latest/case_studies/LKJ.html](https://www.pymc.io/projects/examples/en/latest/case_studies/LKJ.html).
