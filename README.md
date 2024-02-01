@@ -16,7 +16,13 @@ the ```data/highD``` folder, e.g., it should contain ```data/highD/**_tracks.csv
 , ```data/highD/**_tracksMeta.csv```, and ```data/highD/**_recordingMeta.csv```.
 
 We develop the probabilistic graphical models (PGMs) with [PyMC](https://github.com/pymc-devs/pymc). Please install
-**PyMC4** by following their instructions. The PGMs in this work are implemented
+**PyMC4** by following their instructions:
+```
+conda create -c conda-forge -n pymc_env "pymc=4"
+conda activate pymc_env
+```
+
+The PGMs in this work are implemented
 in: ```PGM_highD/Bayesian_IDM_(hierarchy)_(driver_type).ipynb```, ```PGM_highD/MA_IDM_(hierarchy)_(driver_type).ipynb```,
 and ```PGM_highD/AR_IDM_(hierarchy)_(driver_type).ipynb```;
 
