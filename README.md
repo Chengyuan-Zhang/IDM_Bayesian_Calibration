@@ -1,5 +1,3 @@
-## *(Update: the stochastic simulations of the pooled and unpooled models will be updated later)*
-
 # Bayesian Calibration of IDM
 
 This repo provides the implementation of MA-IDM and Bayesian IDM in ''**Bayesian Calibration of Intelligent Driver Model**,'' as well as the dynamic IDM (AR+IDM) in our latest paper "**Calibrating Car-following Models via Bayesian Dynamic Regression.**" Besides, the repo provides the implementation of the multi-vehicle ring-road simulations.
