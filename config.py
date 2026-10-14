@@ -25,5 +25,12 @@ class Config:
     sim_ring_init_speed = 11.6
     sim_veh_length = 5
 
-    car_interactive_pair_list = [14, 35, 23, 25, 36, 38, 60, 90, 228, 232]
-    truck_interactive_pair_list = [3, 4, 18, 52, 81, 144, 153, 162, 5, 241]
+    # Preserve the original 20 vehicles, regrouped by their true highD class.
+    # Keys are (recording ID, follower ID), independent of cache/list order.
+    # Historical outputs used the old 10/10 groups; refit before using v2 traces.
+    car_interactive_pair_list = [
+        (25, 273), (25, 352), (25, 309), (25, 314), (25, 355), (25, 361),
+        (25, 412), (25, 1005), (26, 404), (25, 211), (25, 287), (25, 398),
+        (25, 747), (25, 2486), (25, 2502), (25, 2524),
+    ]
+    truck_interactive_pair_list = [(25, 216), (25, 221), (26, 816), (26, 343)]

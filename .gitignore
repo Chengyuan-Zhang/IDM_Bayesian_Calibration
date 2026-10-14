@@ -1,0 +1,7 @@
+data/highD/
+data/cache/*_metadata_v2.pkl
+PGM_highD/cache/
+PGM_highD_joint/cache/
+Simulator/cache/
+**/__pycache__/
+**/.ipynb_checkpoints/

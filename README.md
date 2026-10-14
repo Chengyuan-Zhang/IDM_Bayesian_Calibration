@@ -1,5 +1,7 @@
 # Bayesian Calibration of IDM
 
+> **Confirmed highD preprocessing bug, 14 October 2026.** Historical vehicle-class labels and lane-change filtering used row indices as vehicle IDs. The public 251-pair cache contains 84 incorrect class labels. The fix uses vehicle IDs, corrected grouping, and versioned caches. Read the [bug notice and migration instructions](BUG_NOTICE.md) before using the highD notebooks or interpreting car/truck comparisons. Historical notebook outputs remain unchanged; corrected model results have not been produced by this patch.
+
 This repo provides the implementation of MA-IDM and Bayesian IDM in ''**Bayesian Calibration of Intelligent Driver Model**,'' as well as the dynamic IDM (AR+IDM) in our latest paper "**Calibrating Car-following Models via Bayesian Dynamic Regression.**" Besides, the repo provides the implementation of the multi-vehicle ring-road simulations.
 
 <center>
@@ -8,8 +10,7 @@ This repo provides the implementation of MA-IDM and Bayesian IDM in ''**Bayesian
 
 ## How to run
 
-We calibrate our model on [highD dataset](https://www.highd-dataset.com/). The preprocessed data are stored
-in ```data/cache/*.pkl```. To implement your preprocessing procedures, please download and store the original data in
+We calibrate our model on [highD dataset](https://www.highd-dataset.com/). The files originally distributed in `data/cache/*.pkl` are historical caches affected by the bug above. Corrected preprocessing generates separate `*_metadata_v2.pkl` caches from your licensed highD files and never loads the historical pair caches. To implement your preprocessing procedures, please download and store the original data in
 the ```data/highD``` folder, e.g., it should contain ```data/highD/**_tracks.csv```
 , ```data/highD/**_tracksMeta.csv```, and ```data/highD/**_recordingMeta.csv```.
 

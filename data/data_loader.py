@@ -6,15 +6,31 @@ import os
 from os import path
 import pickle
 from pickle import UnpicklingError
+from typing import Any, Dict, Optional, Sequence, Tuple, Union
 
 # from pykalman import KalmanFilter
 
 pair_id = 0
+PREPROCESSING_VERSION = 2
+
+
+class CFPairList(list):
+    """Support stable (recording ID, follower ID) keys as well as list indices."""
+
+    def __getitem__(self, key: Union[int, slice, Tuple[int, int]]) -> Any:
+        if isinstance(key, tuple):
+            matches = [pair for pair in self
+                       if (pair['recording_id'], int(pair['id_Foll'])) == key]
+            if len(matches) != 1:
+                raise KeyError("Expected one car-following pair for %r, found %d" % (key, len(matches)))
+            return matches[0]
+        return super().__getitem__(key)
 
 
 def load_CF_pairs(tracks, LC_id, class_list, min_traj_lenth=Config.min_traj_lenth):
     global pair_id
     track_pair_list_temp = []
+    tracks_by_id = {int(track['id']): track for track in tracks}
     for tracks_dict in tracks:
         if tracks_dict['id'] in LC_id:  # continue if this ID change lane
             continue
@@ -44,7 +60,7 @@ def load_CF_pairs(tracks, LC_id, class_list, min_traj_lenth=Config.min_traj_lent
                           'precedingId_Foll': tracks_dict['precedingId'][valid_idx],
                           'frame_Foll': tracks_dict['frame'][valid_idx],
                           'id_Foll': tracks_dict['id'],
-                          'class_foll': class_list[tracks_dict['id']]
+                          'class_foll': class_list.loc[int(tracks_dict['id'])]
                           }
             xLeaderReal = np.zeros(len_valid)
             vLeaderReal = np.zeros(len_valid)
@@ -52,7 +68,7 @@ def load_CF_pairs(tracks, LC_id, class_list, min_traj_lenth=Config.min_traj_lent
             for leader_id in np.unique(track_pair['precedingId_Foll']):
                 leader_frame_idx = np.where(track_pair['precedingId_Foll'] == leader_id)[0]
                 leader_frame = track_pair['frame_Foll'][leader_frame_idx]
-                leader_tracks = tracks[leader_id - 1]
+                leader_tracks = tracks_by_id[int(leader_id)]
                 assert leader_tracks['id'] == leader_id
                 common_frames, _, idx_in_leader_tracks = np.intersect1d(leader_frame, leader_tracks['frame'],
                                                                         return_indices=True)
@@ -147,62 +163,49 @@ def load_CF_pairs(tracks, LC_id, class_list, min_traj_lenth=Config.min_traj_lent
 
 
 # Load dataset with preprocessing
-def read_training_data(base_path='../CF_data/highD', dataset_list=[*range(1, 61)],
-                       min_traj_lenth=Config.min_traj_lenth):
+def read_training_data(base_path: str = '../data/highD/',
+                       dataset_list: Optional[Sequence[int]] = None,
+                       min_traj_lenth: int = Config.min_traj_lenth,
+                       cache_dir: Optional[str] = None) -> CFPairList:
+    """Read corrected pairs; preserve and never reuse historical pair caches.
+
+    New caches use a versioned filename and payload. Stable recording/vehicle
+    keys survive changes in extraction order; pair_No is only a list index.
     """
-    Data are from highD
-    :param dataset_list:
-    :param base_path:
-    :return:
-    """
-    track_pair_list = []
-    track_pair_list_temp = []
+    if dataset_list is None:
+        dataset_list = range(1, 61)
+    if cache_dir is None:
+        cache_dir = path.normpath(path.join(base_path, '../cache'))
+    os.makedirs(cache_dir, exist_ok=True)
+    track_pair_list = CFPairList()
     for dataset_id in dataset_list:
-        cache = path.join(base_path,
-                          "../cache/track_pair_list_temp" + str("{:02d}".format(dataset_id)) + '_MinLength' + str(
-                              int(min_traj_lenth / Config.frame_rate_orignial)) + '_freq_' + str(
-                              "{:d}".format(int(Config.frame_rate))) + '.pkl')
+        cache = path.join(cache_dir, 'track_pair_list_temp{:02d}_MinLength{}_freq_{}_metadata_v2.pkl'.format(
+            dataset_id, int(min_traj_lenth / Config.frame_rate_orignial), int(Config.frame_rate)))
         if path.exists(cache):
-            try:
-                fp = open(cache, 'rb')
-                track_pair_list_temp = pickle.load(fp)
-                fp.close()
-                # print("Load", cache, ": done")
-            except UnpicklingError:
-                os.remove(cache)
-                print('Removed broken cache:', cache)
+            with open(cache, 'rb') as fp:
+                payload = pickle.load(fp)
+            if not isinstance(payload, dict) or payload.get('preprocessing_version') != PREPROCESSING_VERSION:
+                raise ValueError('Invalid preprocessing cache version: ' + cache)
+            track_pair_list_temp = payload['pairs']
         else:
             tracks = read_dataset(base_path, dataset_id)
-            meta_dataset_path = base_path + str("{:02d}".format(dataset_id)) + "_tracksMeta.csv"
-            LC_id, class_list = read_track_meta_csv(meta_dataset_path)
-            track_pair_list_temp = load_CF_pairs(tracks, LC_id, class_list, min_traj_lenth)
-            # dataset_path = base_path + str("{:02d}".format(dataset_id)) + "_tracks.csv"
-            # id_in_frame = find_id_in_frame(dataset_path, base_path, dataset_id)
-            output_file = open(cache, 'wb')
-            pickle.dump(track_pair_list_temp, output_file)
-            print("Saved", cache, ": done")
-        track_pair_list.extend(track_pair_list_temp)
-    #     print("Total number of pairs:", len(track_pair_list))
+            meta_path = path.join(base_path, '{:02d}_tracksMeta.csv'.format(dataset_id))
+            lane_change_ids, class_by_id = read_track_meta_csv(meta_path)
+            track_pair_list_temp = load_CF_pairs(tracks, lane_change_ids, class_by_id, min_traj_lenth)
+            for pair in track_pair_list_temp:
+                pair['recording_id'] = int(dataset_id)
+            with open(cache, 'wb') as output_file:
+                pickle.dump({'preprocessing_version': PREPROCESSING_VERSION, 'pairs': track_pair_list_temp}, output_file)
+            print('Saved', cache, ': done')
+        for pair in track_pair_list_temp:
+            pair['pair_No'] = len(track_pair_list)
+            track_pair_list.append(pair)
     return track_pair_list
 
 
-def read_id_60(base_path):
-    cache = path.join(base_path, "../cache/track_ID_60" + str("{:.02f}".format(Config.dt)) + ".pkl")
-    if path.exists(cache):
-        try:
-            fp = open(cache, 'rb')
-            track = pickle.load(fp)
-            fp.close()
-            print("Load", cache, ": done")
-        except UnpicklingError:
-            os.remove(cache)
-            print('Removed broken cache:', cache)
-    else:
-        track = read_training_data(base_path=base_path, dataset_list=[*range(1, 61)])
-        output_file = open(cache, 'wb')
-        pickle.dump(track[60], output_file)
-        print("Saved ", cache, ": done")
-    return track
+def read_id_60(base_path: str) -> Dict[str, Any]:
+    """Return pair index 60 from the corrected dataset on every call."""
+    return read_training_data(base_path=base_path)[60]
 
 
 def KF_tracks(tracks, dim=3):
