@@ -4,6 +4,8 @@
 
 We confirmed an indexing error in the highD preprocessing distributed with this repository. It affects the vehicle-class labels in the historical pair caches and the interpretation of the configured car/truck groups. We also confirmed an error in the lane-change exclusion rule. We apologize for these errors.
 
+We thank **Wuping Xin** for discovering and reporting the vehicle-class indexing error. His detailed report and concrete example helped us verify and correct the issue.
+
 ## What went wrong
 
 At commit [`7520b15`](https://github.com/Chengyuan-Zhang/IDM_Bayesian_Calibration/commit/7520b15a8b163f52532cd3e5c7f7d4db05fc43f0), `read_track_meta_csv` returned the `class` column with its default zero-based row index. `load_CF_pairs` queried that column using the one-based vehicle ID. Vehicle `k` consequently received vehicle `k+1`'s class, while its trajectory and vehicle length still belonged to vehicle `k`.
