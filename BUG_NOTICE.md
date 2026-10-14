@@ -4,7 +4,7 @@
 
 We confirmed an indexing error in the highD preprocessing distributed with this repository. It affects the vehicle-class labels in the historical pair caches and the interpretation of the configured car/truck groups. We also confirmed an error in the lane-change exclusion rule. We apologize for these errors.
 
-We thank **Wuping Xin** for discovering and reporting the vehicle-class indexing error. His detailed report and concrete example helped us verify and correct the issue.
+We thank Dr. **Wuping Xin** for discovering and reporting the vehicle-class indexing error. His detailed report and concrete example helped us verify and correct the issue.
 
 ## What went wrong
 
@@ -44,8 +44,6 @@ Changing only the class lookup left all non-class fields of the 251 extracted pa
 ## Scope of scientific conclusions
 
 This repository provides code for *Bayesian Calibration of the Intelligent Driver Model* and *Calibrating Car-following Models via Bayesian Dynamic Regression*. The public implementation's car/truck labels and comparisons require reassessment. **This patch does not provide recalibrated models, corrected performance metrics, or a completed assessment of either paper's published conclusions.** Historical notebook outputs and figures have not been recomputed and remain historical results.
-
-This audit does not determine whether the preprocessing used for the separate 2026 paper *When context is not enough* shares this error. That question requires its actual preprocessing version and input-data provenance. No claim of either impact or absence of impact on that paper is made here.
 
 ## Using the corrected code
 
