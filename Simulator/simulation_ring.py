@@ -68,11 +68,11 @@ def GP(X1, y1, X2, kernel_func, tr):
 
 def ring_scenarios(sim_method='IDM'):
     if sim_method == 'AR':
-        cache = '../PGM_highD_joint/cache/AR4_IDM_hierarchical.pkl'
+        cache = '../PGM_highD_joint/cache/AR4_IDM_hierarchical_metadata_v2.pkl'
     elif sim_method == 'GP':
-        cache = "../PGM_highD/cache/MA_IDM_hierarchical.pkl"
+        cache = "../PGM_highD/cache/MA_IDM_hierarchical_metadata_v2.pkl"
     else:
-        cache = '../PGM_highD_joint/cache/Bayesian_IDM_hierarchical.pkl'
+        cache = '../PGM_highD_joint/cache/Bayesian_IDM_hierarchical_metadata_v2.pkl'
 
     tr = load_trace(cache)
     id_idx = np.random.choice(range(2000), Config.sim_ring_tracks, replace=False)
@@ -323,19 +323,19 @@ def plot_speed_density(savefig):
 
 def load_tracks(sim_method):
     if sim_method == 'GP':
-        cache = "../Simulator/cache/GP_IDM-sim_{:d}_{:d}_{:d}_11_noisy.pkl".format(int(Config.sim_ring_tracks),
+        cache = "../Simulator/cache/GP_IDM-sim_{:d}_{:d}_{:d}_11_noisy_metadata_v2.pkl".format(int(Config.sim_ring_tracks),
                                                                                    int(Config.sim_ring_time),
                                                                                    Config.sim_ring_radius)
     elif sim_method == 'AR':
-        cache = "../Simulator/cache/AR_IDM-sim_{:d}_{:d}_{:d}_11_noisy.pkl".format(int(Config.sim_ring_tracks),
+        cache = "../Simulator/cache/AR_IDM-sim_{:d}_{:d}_{:d}_11_noisy_metadata_v2.pkl".format(int(Config.sim_ring_tracks),
                                                                                    int(Config.sim_ring_time),
                                                                                    Config.sim_ring_radius)
     elif sim_method == 'Bayesian':
-        cache = "../Simulator/cache/B_IDM-sim_{:d}_{:d}_{:d}_11_noisy.pkl".format(int(Config.sim_ring_tracks),
+        cache = "../Simulator/cache/B_IDM-sim_{:d}_{:d}_{:d}_11_noisy_metadata_v2.pkl".format(int(Config.sim_ring_tracks),
                                                                                   int(Config.sim_ring_time),
                                                                                   Config.sim_ring_radius)
     else:
-        cache = "../Simulator/cache/IDM-sim_{:d}_{:d}_{:d}_11_noisy.pkl".format(int(Config.sim_ring_tracks),
+        cache = "../Simulator/cache/IDM-sim_{:d}_{:d}_{:d}_11_noisy_metadata_v2.pkl".format(int(Config.sim_ring_tracks),
                                                                                 int(Config.sim_ring_time),
                                                                                 Config.sim_ring_radius)
 

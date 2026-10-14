@@ -4,6 +4,7 @@ import os
 from os import path
 import pickle
 from pickle import UnpicklingError
+from typing import Tuple
 
 # TRACK FILE
 BBOX = "bbox"
@@ -68,11 +69,12 @@ UPPER_LANE_MARKINGS = "upperLaneMarkings"
 LOWER_LANE_MARKINGS = "lowerLaneMarkings"
 
 
-def read_track_meta_csv(arguments):
+def read_track_meta_csv(arguments: str) -> Tuple[np.ndarray, pandas.Series]:
+    """Return lane-changing vehicle IDs and classes indexed by vehicle ID."""
     df = pandas.read_csv(arguments)
-    grouped = df.groupby([LANECHANGE], sort=False)
-    LC_id = [grouped.groups[1].values]
-    return LC_id[0], df['class']
+    class_by_id = df.set_index(TRACK_ID, verify_integrity=True)[CLASS]
+    lane_change_ids = df.loc[df[LANECHANGE] > 0, TRACK_ID].to_numpy()
+    return lane_change_ids, class_by_id
 
 
 def read_track_csv(arguments):
@@ -132,24 +134,14 @@ def read_track_csv(arguments):
     return tracks
 
 
-def read_dataset(base_path, dataset_id):
-    cache = path.join(base_path, "dataset_" + str(dataset_id) + '.pkl')
+def read_dataset(base_path: str, dataset_id: int) -> list:
+    """Read tracks without writing to or deleting files in the raw data directory."""
+    cache = path.join(base_path, 'dataset_{}.pkl'.format(dataset_id))
     if path.exists(cache):
-        try:
-            fp = open(cache, 'rb')
-            track = pickle.load(fp)
-            fp.close()
-            print("Load dataset", dataset_id, ": done")
-        except UnpicklingError:
-            os.remove(cache)
-            print('Removed broken cache:', cache)
-    else:
-        dataset_path = base_path + str("{:02d}".format(dataset_id)) + "_tracks.csv"
-        track = read_track_csv(dataset_path)  # with preprocessing
-        output_file = open(base_path + "dataset_" + str(dataset_id) + '.pkl', 'wb')
-        pickle.dump(track, output_file)
-        print("Saved dataset", dataset_id, ": done")
-    return track
+        with open(cache, 'rb') as fp:
+            return pickle.load(fp)
+    dataset_path = path.join(base_path, '{:02d}_tracks.csv'.format(dataset_id))
+    return read_track_csv(dataset_path)
 
 
 def find_id_in_frame(arguments, base_path, dataset_id):
